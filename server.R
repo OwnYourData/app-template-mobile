@@ -5,6 +5,5 @@ shinyServer(function(input, output, session) {
         source('srvBase.R', local=TRUE)
         source('appBaseShiny.R', local=TRUE)
         source('srvInit.R', local=TRUE)
-        source('srvUi.R', local=TRUE)
         source('appLogic.R', local=TRUE)
 })

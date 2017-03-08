@@ -2,7 +2,6 @@
 # last update: 2017-03-01
 
 currApp <- reactive({
-        input$p2next
         input$disconnectPIA
         app <- vector()
         piaMsg <- ''
@@ -47,38 +46,18 @@ currApp <- reactive({
                             style = 'danger', append = FALSE,
                             title = 'Verbindung zum Datentresor',
                             content = piaMsg)
-                createAlert(session, 'mailConfigStatus', 
-                            alertId = 'myMailConfigStatus',
-                            style = 'warning', append = FALSE,
-                            title = 'Fehlende Email Konfiguration',
-                            content = mailConfigMsg)
                 app <- vector()
         } else {
                 closeAlert(session, 'myPiaStatus')
-                
-                # set alert for missing email config
-                url <- itemsUrl(app[['url']], schedulerEmailConfigKey)
-                data <- list(server=input$modalMailerAddress,
-                             port=input$modalMailerPort,
-                             user=input$modalMailerUser,
-                             pwd=input$modalMailerPassword)
-                mailConfig <- readItems(app, url)
-                if(nrow(mailConfig) == 0){
-                        createAlert(session, 'mailConfigStatus', 
-                                    alertId = 'myMailConfigStatus',
-                                    style = 'warning', append = FALSE,
-                                    title = 'Fehlende Email Konfiguration',
-                                    content = mailConfigMsg)
-                }
         }
         app
 })
 
 currData <- reactive({
         # list any input controls that effect currData
-        input$modalPiaUrl
-        input$modalPiaId
-        input$modalPiaSecret
+        input$pia_urlMobile
+        input$app_keyMobile
+        input$app_secretMobile
         
         app <- currApp()
         if(length(app) > 0) {
@@ -90,66 +69,35 @@ currData <- reactive({
         }
 })
 
-observe({
-        if(!is.null(input$dateSelect)){
-                switch(input$dateSelect,
-                       '1'={ updateDateRangeInput(session, 'dateRange',
-                                                  start = as.Date(Sys.Date()-7),
-                                                  end = as.Date(Sys.Date())) },
-                       '2'={ updateDateRangeInput(session, 'dateRange',
-                                                  start = as.Date(Sys.Date() - months(1)),
-                                                  end = as.Date(Sys.Date())) },
-                       '3'={ updateDateRangeInput(session, 'dateRange',
-                                                  start = as.Date(Sys.Date() - months(2)),
-                                                  end = as.Date(Sys.Date())) },
-                       '4'={ updateDateRangeInput(session, 'dateRange',
-                                                  start = as.Date(Sys.Date() - months(6)),
-                                                  end = as.Date(Sys.Date())) },
-                       '5'={ updateDateRangeInput(session, 'dateRange',
-                                                  start = as.Date(paste(year(Sys.Date()),'1','1',sep='-')),
-                                                  end = as.Date(paste(year(Sys.Date()),'12','31',sep='-'))) },
-                       '6'={ updateDateRangeInput(session, 'dateRange',
-                                                  start = as.Date(Sys.Date() - months(12)),
-                                                  end = as.Date(Sys.Date())) },
-                       '10'={ data <- currData() },
-                       {})
-        }
-})
-
-
-currDataSelect <- reactive({
-        data <- currData()
-        if(nrow(data) == 0) {
-                createAlert(session, 'dataStatus', alertId = 'myDataStatus',
-                            style = 'warning', append = FALSE,
-                            title = 'Keine Daten im gewählten Zeitfenster',
-                            content = 'Für das ausgewählte Zeitfenster sind keine Daten vorhanden.')
-                data <- data.frame()
-        } else {
-                data$dat <- as.POSIXct(data$date, 
-                                       format='%Y-%m-%d')
-                dataMin <- min(data$dat, na.rm=TRUE)
-                dataMax <- max(data$dat, na.rm=TRUE)
-                curMin <- as.Date(input$dateRange[1], '%d.%m.%Y')
-                curMax <- as.Date(input$dateRange[2], '%d.%m.%Y')
-                daterange <- seq(curMin, curMax, 'days')
-                data <- data[as.Date(data$dat) %in% daterange, ]
-                if(nrow(data)>0){
-                        closeAlert(session, 'myDataStatus')
-                }
-        }
-        data
-})
-
 currDataDateSelectTimestamp <- reactive({
         closeAlert(session, 'myDataStatus')
         data <- currData()
         if(nrow(data) > 0){
-                mymin <- as.Date(input$dateRange[1], '%d.%m.%Y')
-                mymax <- as.Date(input$dateRange[2], '%d.%m.%Y')
-                if(mymax > mymin){
+                data <- data[data$topic == input$topicSelect, ]
+                if(nrow(data) > 0){
+                        myRange <- c(mymin = as.Date(Sys.Date()),
+                                     mymax = as.Date(Sys.Date()))
+                        switch(input$dateSelect,
+                               '1' = { myRange <- c(mymin = as.Date(Sys.Date()-7),
+                                                    mymax = as.Date(Sys.Date())) },
+                               '2' = { myRange <- c(mymin = as.Date(Sys.Date() - months(1)),
+                                                    mymax = as.Date(Sys.Date())) },
+                               '3' = { myRange <- c(mymin = as.Date(Sys.Date() - months(2)),
+                                                    mymax = as.Date(Sys.Date())) },
+                               '4' = { myRange <- c(mymin = as.Date(Sys.Date() - months(6)),
+                                                    mymax = as.Date(Sys.Date())) },
+                               '5' = { myRange <- c(mymin = as.Date(paste(year(Sys.Date()),'1','1',sep='-')),
+                                                    mymax = as.Date(paste(year(Sys.Date()),'12','31',sep='-'))) },
+                               '6' = { myRange <- c(mymin = as.Date(Sys.Date() - months(12)),
+                                                    mymax = as.Date(Sys.Date())) },
+                               '10'= { myRange <- c(mymin = as.Date('1970-01-01'),
+                                                    mymax = as.Date('2070-01-01')) },
+                               {})
+                        
+                        mymin <- myRange['mymin']
+                        mymax <- myRange['mymax']
                         daterange <- seq(mymin, mymax, 'days')
-                        data$dat <- as.Date(as.POSIXct(data$time/1000, origin='1970-01-01'))
+                        data$dat <- as.Date(as.POSIXct(as.numeric(data$timestamp), origin='1970-01-01'))
                         data <- data[data$dat %in% daterange, ]
                         if(nrow(data) > 0){
                                 data
@@ -163,8 +111,8 @@ currDataDateSelectTimestamp <- reactive({
                 } else {
                         createAlert(session, 'dataStatus', alertId = 'myDataStatus',
                                     style = 'warning', append = FALSE,
-                                    title = 'Ungültiges Zeitfenster',
-                                    content = 'Im ausgewählten Zeitfenster liegt das End-Datum vor dem Beginn-Datum. Korriege die Eingabe!')
+                                    title = 'Keine Daten für gewählten Bereich',
+                                    content = 'Für den gewählten Bereich sind noch keine Daten vorhanden.')
                         data.frame()
                 }
         } else {

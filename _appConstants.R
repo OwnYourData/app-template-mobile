@@ -5,3 +5,4 @@
 appName <- 'mobile-template'
 appTitle <- 'Mobiles Template'
 app_id <- 'eu.ownyourdata.template'
+desktopUrl <- 'https://template.datentresor.org'

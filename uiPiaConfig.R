@@ -1,5 +1,6 @@
 uiPiaConfig <- function(){
-        tabPanel('Verbindung zum Datentresor',
+        tabPanel(HTML(paste0('Verbindung zum Datentresor</a></li>',
+                             '<li><a href="', desktopUrl, '">zur Desktop Version')),
                  h3('Datentresor'),
                  textInput('pia_urlMobile', 'Adresse:'),
                  textInput('app_keyMobile', 'Identifier:'),

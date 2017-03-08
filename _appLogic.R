@@ -20,3 +20,8 @@ repoData <- function(repo){
         }
         data
 }
+
+# anything that should run only once during startup
+appStart <- function(){
+        
+}

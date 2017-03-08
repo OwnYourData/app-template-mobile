@@ -3,9 +3,9 @@
 
 # Comments ================================================
 # - run locally
-#   runApp('~/oyd/template-mobile', host='0.0.0.0', port=1301)
+#   runApp('~/oyd/template-mobile', host='0.0.0.0', port=1300)
 # - copy files to Github
-#   cp -r *.R *.r *.txt www github/app-template-mobile; cd github/app-template-mobile;
+#   cp -r *.R *.r *.txt www docker github/app-template-mobile; cd github/app-template-mobile;
 #   for i in app* ; do mv "$i" "_$i" ; done
 
 # UI files ================================================

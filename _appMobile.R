@@ -1,6 +1,7 @@
 # top-level framework for mobile version
 # last update:2017-03-01
 
+source('appNewData.R')
 source('uiPiaConfig.R')
 
 appMobile <- function(){
@@ -10,9 +11,7 @@ appMobile <- function(){
                 collapsible=TRUE,
                 inverse=FALSE,
                 windowTitle=paste0(appTitle, ' | OwnYourData'),
-                tabPanel('Tab #1',
-                         p('hello mobile world')
-                ),
+                appNewData(),
                 uiPiaConfig()
         )
 }
