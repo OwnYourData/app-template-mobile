@@ -5,7 +5,43 @@ Das App Template Mobil stellt alle notwendigen Methoden zum Zugriff auf den Date
 
 ## Verwendung
 Erstelle eine neue mobile OwnYourData App anhand folgender Schritte:   
+1. App Struktur einrichten    
+führe folgende Befehle auf der Kommandozeile aus:    
+```bash
+git clone git@github.com:OwnYourData/app-template-mobile.git
+mkdir new_app-mobile
+cp -R app-template-mobile/ new_app-mobile/
+rm -rf app-template-mobile/
+cd new_app-mobile
+for i in _app* ; do mv "$i" $(echo $i | cut -c 2-) ; done
+```
+*Überprüfung:* öffne global.R in R-Studio und es sollte möglich sein, die Shiny Applikation zu starten.    
 
+2. Verbindung zum Datentresor aufbauen
+    erstelle das Manifest mit der Datei appManifest.txt    
+    encodiere das Manifest base64 (zB https://www.base64encode.org/)    
+    füge das Manifest im eigenen Datentresor hinzu
+    
+    *Überprüfung:* App starten und der Name des Datentresors wird in der App angezeigt
+    
+3. App spezifische Anpassungen durchführen    
+    bearbeite die Datei `appConstants.R` und gib App-Titel und Datenstruktur an    
+    
+    *Überprüfung:* die gestartete App zeigt die richtigen Informationen
+    
+4. Visualisierungen implementieren    
+    bearbeite die Datei `appMobile.R` um Benutzern die Möglichkeit zur Eingabe und Visualisierung von Daten zu geben (Layout)    
+    in der Datei `appLogic.R` werden die server-seitigen Funktionalitäten dafür implementiert    
+    
+    *Überprüfung:* starte die App, zeige die vorhandenen Daten an
+    
+5. Docker Container erstellen
+    bearbeite die Dateien im Unterverzeichnis `docker/` und erstelle einen Container mit dem Befehl    
+    `docker build -t APP-NAME .`
+    
+    *Überprüfung:* starte den Container und verbinde dich im Browser    
+    `docker run --name APP_NAME -d -p 3838:3838 APP-NAME
+    
 &nbsp;    
 
 ## Verbessere das App Template Mobil
